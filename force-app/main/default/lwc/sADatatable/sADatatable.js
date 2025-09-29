@@ -953,6 +953,10 @@ export default class MassEditTable extends LightningElement {
         //})
     }*/
 
+    handleRowAction() {
+        console.log('row action');
+    }
+
 
     multpicklistChanged(event) {
         event.stopPropagation();
@@ -1392,11 +1396,88 @@ export default class MassEditTable extends LightningElement {
                 }
             }
         })
-        console.log(this.changedValues);
+        console.log('Changed Values' + this.changedValues);
+
+
+        updateRecords({ recordsToUpdate: this.changedValues })
+        .then(result => {
+            this.afterSaveResult = result;
+            console.log("this.afterSaveResult: ", this.afterSaveResult);
+            if (this.afterSaveResult === null) {
+                    const message = new ShowToastEvent({
+                        title: 'Success!',
+                        message: 'All ' + this.changedValues.length + ' Records updated successfully.',
+                        variant: 'success',
+                    });
+                    this.dispatchEvent(message);
+            }
+            else{
+            const objectLength = Object.keys(this.afterSaveResult).length;
+            const successLength = this.changedValues.length - objectLength;
+            //this.successfulRecords = this.afterSaveResult[0];
+           // this.failedRecords = this.afterSaveResult[1];
+            if(objectLength === 0) {
+                const message = new ShowToastEvent({
+                    title: 'Success!',
+                    message: 'All ' + successLength + ' Records updated successfully.',
+                    variant: 'success',
+                });
+                this.dispatchEvent(message);
+            }
+            else if (objectLength > 0 && successLength > 0) {
+                let errorMsg = '';
+                for (let key in this.afterSaveResult) {
+                    if (this.afterSaveResult.hasOwnProperty(key)) {
+                        errorMsg += "Service Appointment with Id: \""+ key + "\" ran into the error: \"" + this.afterSaveResult[key] + "\" while saving. ";
+                    }
+                }
+                const msg = new ShowToastEvent({
+                    title: 'Partial Success',
+                    message: successLength + ' Records updated successfully.',
+                    variant: 'success',
+                });
+                this.dispatchEvent(msg);
+                const message = new ShowToastEvent({
+                    title: 'Some Records Failed to Save',
+                    message: 'Unable to update these records. ' + errorMsg,
+                    variant: 'error',
+                    mode: 'sticky'
+                });
+                this.dispatchEvent(message);
+            }
+            else if (objectLength > 0 && successLength === 0 ) {
+                let errorMsg = '';
+                for (let key in this.afterSaveResult) {
+                    if (this.afterSaveResult.hasOwnProperty(key)) {
+                        errorMsg += "Service Appointment with Id: \""+ key + "\" ran into the error: \"" + this.afterSaveResult[key] + "\" while saving. ";
+                    }
+                }
+                const message = new ShowToastEvent({
+                    title: 'No Records Were Saved',
+                    message: 'Unable to update records. ' + errorMsg,
+                    variant: 'error',
+                    mode: 'sticky'
+                });
+                this.dispatchEvent(message);
+            }
+            }
+            this.draftValues = [];
+            this.changedValues = [];
+            //this.lastSavedData = this.serviceAppointments;
+            refreshApex(this.refreshServiceAppointments);
+            this.rowLimit = 20;
+            this.rowOffSet = 0;
+            this.serviceAppointments = [];
+            this.showHeader = false;
+        }).finally(() => {
+           refreshApex(this.refreshServiceAppointments);
+           this.showSpinner = false;
+        });
+
         // Create an array to store the promises for each updateRecord call
-        const promises = [];
+        //const promises = [];
         // Loop through the updatedRecords array and call updateRecord for each record
-        this.changedValues.forEach(record => {
+        /*this.changedValues.forEach(record => {
             this.updateDataValues(record);
             const recordfields = {
                 fields: record
@@ -1433,7 +1514,7 @@ export default class MassEditTable extends LightningElement {
                 refreshApex(this.refreshData);
                 this.showSpinner = false;
             });
-        this.changedValues = [];
+        this.changedValues = [];*/
     }
 
     handleHeaderAction (event) { //used to enable custom header actions for columns
