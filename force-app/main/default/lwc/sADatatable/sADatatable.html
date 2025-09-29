@@ -52,7 +52,41 @@
                     <div class="accord-button">
                         <lightning-button label={detailsLabel} variant="brand" title="Toggle details collapse" onclick={handleDetailToggle}></lightning-button>
                     </div>
-                <lightning-accordion allow-multiple-sections-open onsectiontoggle={handleSectionToggle} active-section-name={activeSections}>
+
+                    <lightning-record-edit-form object-api-name={objectApiName}>
+                        <lightning-accordion allow-multiple-sections-open onsectiontoggle={handleSectionToggle} active-section-name={activeSections}>
+                            <template for:each={organizedFields} for:item="section">
+                                <lightning-accordion-section key={section.name} name={section.name} label={section.label}>
+                                    <div class="slds-grid slds-wrap slds-gutters">
+                                        <template for:each={section.fields} for:item="field">
+                                            <div key={field.apiName} class="slds-col slds-size_1-of-2">
+                                                <template lwc:if={field.typeBool}>
+                                                    <lightning-combobox
+                                                        label={field.apiName}
+                                                        name={field.apiName}
+                                                        value={field.value}
+                                                        options={booleanOptions}
+                                                        placeholder="--None--" dropdown-alignment="auto"
+                                                        onchange={handleFieldChange}>
+                                                    </lightning-combobox>
+                                                </template>
+                                                <template lwc:else>
+                                                    <lightning-input-field
+                                                        field-name={field.apiName}
+                                                        value={field.value}
+                                                        onchange={handleFieldChange}>
+                                                    </lightning-input-field>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                            </template>
+                        </lightning-accordion>
+                    </lightning-record-edit-form>
+
+
+                <!--<lightning-accordion allow-multiple-sections-open onsectiontoggle={handleSectionToggle} active-section-name={activeSections}>
                     <lightning-accordion-section name="A" label="Training Details">
                         <div class="accordian-class">
                         <div class="row-class">    
@@ -79,8 +113,8 @@
                             <lightning-button label={trainingLabel} variant="brand" title="Toggle content action" onclick={handleTrainingToggle}></lightning-button>
                         </div> 
                     </div>
-                    </lightning-accordion-section>
-                    <lightning-accordion-section name="B" label="Account Contact Information">
+                    </lightning-accordion-section>-->
+                    <!--<lightning-accordion-section name="B" label="Account Contact Information">
                         <div class="accordian-class">
                         <div class="row-class">    
                             <div class="row-item">   
@@ -107,11 +141,11 @@
                             <div class="row-item">          
                                 <lightning-textarea data-recid="massEdit" type='text' name="Multi_Trainer_Event_Details__c" label="Multi-Trainer Event Details" value={multiTrainerDetailsValue} placeholder="Enter..." onchange={handleChange}> </lightning-textarea>
                             </div>    
-                            <!--
+                            
                             <div class="row-item">           
                                 <lightning-input data-recid="massEdit" type='text' name="Multi_Trainer_Event_Details__c" label="Multi-Trainer Event Details" value={multiTrainerDetailsValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
                             </div> 
-                            -->
+                            
                             <div class="row-item">         
                                 <lightning-combobox data-recid="massEdit" class='picklist' name="PLS_Confirmation_status__c" label="PLS Confirmation Status"  options={plsOptions} value={plsValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
                             </div>
@@ -120,8 +154,8 @@
                             <lightning-button label={accountLabel} variant="brand" title="Toggle account action" onclick={handleAccountToggle}></lightning-button>
                         </div>
                         </div>
-                    </lightning-accordion-section>
-                    <lightning-accordion-section name="C" label="Session Details">
+                    </lightning-accordion-section>-->
+                    <!--<lightning-accordion-section name="C" label="Session Details">
                         <div class="accordian-class">
                         <div class="row-class">    
                             <div class="row-item"> 
@@ -196,7 +230,7 @@
                         </div>
                         </div>
                     </lightning-accordion-section>
-                </lightning-accordion>
+                </lightning-accordion>-->
                 </div>
                     <!--
                  <div class="picklist-container">

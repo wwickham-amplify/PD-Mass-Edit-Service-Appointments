@@ -8,6 +8,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { publish, MessageContext } from 'lightning/messageService';
 import updateRecords from '@salesforce/apex/FSL_SA_MASS_Edit.updateRecords';
 import recordSelected from '@salesforce/messageChannel/selectedRecords__c';
+import SERVICE_APPOINTMENT from '@salesforce/schema/ServiceAppointment';
 import STATUS_FIELD from '@salesforce/schema/ServiceAppointment.Status';
 import SCHEDULING_STATUS_FIELD from '@salesforce/schema/ServiceAppointment.Schedulers_Status__c';
 import DATE_TO_SCHEDULE_FIELD from '@salesforce/schema/ServiceAppointment.Date_to_Schedule__c';
@@ -19,7 +20,7 @@ import TRAINING_FIELD from '@salesforce/schema/ServiceAppointment.Training_Type_
 import ASSIGN_STRAT_FIELD from '@salesforce/schema/ServiceAppointment.Assigned_PD_Strategist__c';
 import ATTENDEES_FIELD from '@salesforce/schema/ServiceAppointment.Number_of_Attendees__c';
 import MULTI_TRAINER_FIELD from '@salesforce/schema/ServiceAppointment.Multi_Trainer_Event__c';
-import TRAINING_CONTACT_FIELD from '@salesforce/schema/ServiceAppointment.ContactId';
+import CONTACT_FIELD from '@salesforce/schema/ServiceAppointment.ContactId';
 import TRAINING_INFO_FIELD from '@salesforce/schema/ServiceAppointment.Training_Contact_Information__c';
 import EVENT_LEAD_FIELD from '@salesforce/schema/ServiceAppointment.Multi_Trainer_Event_Lead__c';
 import PLS_FIELD from '@salesforce/schema/ServiceAppointment.PLS_Confirmation_status__c';
@@ -505,7 +506,7 @@ export default class MassEditTable extends LightningElement {
         [ASSIGN_STRAT_FIELD.fieldApiName]: null,
         [ATTENDEES_FIELD.fieldApiName]: null,
         [MULTI_TRAINER_FIELD.fieldApiName]: null,
-        [TRAINING_CONTACT_FIELD.fieldApiName]: null,
+        [CONTACT_FIELD.fieldApiName]: null,
         [TRAINING_INFO_FIELD.fieldApiName]: null,
         [EVENT_LEAD_FIELD.fieldApiName]: null,
         [PLS_FIELD.fieldApiName]: null,
@@ -530,6 +531,68 @@ export default class MassEditTable extends LightningElement {
         [LOCATION_FIELD.fieldApiName]: null
     }
 
+    objectApiName = SERVICE_APPOINTMENT;
+
+    //An array of fields sorted into sections
+    organizedFields = [
+        {
+            label: "Training Details",
+            name: 'trainingDetails',
+            fields: [
+                { apiName: DATE_TO_SCHEDULE_FIELD, value: null },
+                { apiName: PREF_DATE_FIELD, value: null },
+                { apiName: REQ_START_FIELD, value: null },
+                { apiName: REQ_END_FIELD, value: null },
+                { apiName: TRAINING_FIELD, value: null },
+                { apiName: NOTES_FIELD, value: null }
+            ]
+        },
+        {
+            label: "Account Contact Information",
+            name: "accountContactInformation",
+            fields: [
+                { apiName: CONTACT_FIELD, value: null },
+                { apiName: TRAINING_INFO_FIELD, value: null },
+                { apiName: ASSIGN_STRAT_FIELD, value: null },
+                { apiName: EVENT_LEAD_FIELD, value: null },
+                { apiName: MULTI_TRAINER_FIELD, value: null, typeBool: true },
+                { apiName: MULTI_DETAIL_FIELD, value: null },
+                { apiName: PLS_FIELD, value: null }
+            ]
+        },
+        {
+            label: "Session Details",
+            name: "sessionDetails",
+            fields: [
+                { apiName: ATTENDEES_TYPE_FIELD, value: null },
+                { apiName: GRADE_FIELD, value: null },
+                { apiName: ATTENDEES_FIELD, value: null },
+                { apiName: VIRTUAL_FIELD, value: null },
+                { apiName: LICENSES_FIELD, value: null },
+                { apiName: INFORMATION_FIELD, value: null },
+                { apiName: SUBJECT_FIELD, value: null },
+                { apiName: SESSION_TOPIC_FIELD, value: null },
+                { apiName: DIGITAL_FIELD, value: null, typeBool: true },
+                { apiName: SESSION_VAL_FIELD, value: null }
+            ]
+        },
+        {
+            label: "Address Information",
+            name: "addressInformation",
+            fields: [
+                { apiName: TRAINING_LOCATION_FIELD, value: null },
+                { apiName: LOCATION_FIELD, value: null },
+                { apiName: STREET_FIELD, value: null },
+                { apiName: CITY_FIELD, value: null },
+                { apiName: POSTAL_FIELD, value: null },
+                { apiName: STATE_FIELD, value: null },
+                { apiName: COUNTRY_FIELD, value: null },
+                { apiName: SHIPPING_STATUS_FIELD, value: null },
+                { apiName: INSTRUCTION_FIELD, value: null }
+            ]
+        }
+    ];
+
     //getting options for picklists
     @wire(getPicklistValues, {
         recordTypeId: "012000000000000AAA",
@@ -545,6 +608,12 @@ export default class MassEditTable extends LightningElement {
             ];
         }
     }
+
+    booleanOptions = [
+        { label: '--None--', value: null },
+        { label: 'True', value: 'true' },
+        { label: 'False', value: 'false' }
+    ];
 
     @wire(getPicklistValues, {
         recordTypeId: "012000000000000AAA",
@@ -705,8 +774,41 @@ export default class MassEditTable extends LightningElement {
         }
     }
 
+    changedFields = {};
+
+    handleFieldChange(e) {
+        this.bulkFieldsChanged(e.target.fieldName, e.target.value);
+    }
+
+    handleBooleanChange(e) {
+        this.bulkFieldsChanged(e.detail.name, e.detail.value);
+    }
+
+    bulkFieldsChanged(fieldName, fieldValue) {
+        console.log('Field ' + fieldName + ' was changed to: ' + fieldValue);
+
+        //Check for nulls, undefined, and empty strings
+        const isEmpty =
+            fieldValue === null ||
+            fieldValue === undefined ||
+            (typeof fieldValue === 'string' && fieldValue.trim() === '');
+
+        if (isEmpty) {
+            const { [fieldName]: removed, ...remaining } = this.changedFields;
+            this.changedFields = remaining;
+        } else {
+            this.changedFields = {
+                ...this.changedFields,
+                [fieldName]: fieldValue
+            };
+        }
+
+        console.log('Changed fields: ', this.changedFields);
+    }
+
     //handles header field changes
     handleChange(event) {
+        console.log(event);
         for (const field in this.massFields) {
             if (this.massFields.hasOwnProperty(event.target.name)) {
                 console.log(event.target.name);
@@ -877,7 +979,7 @@ export default class MassEditTable extends LightningElement {
             [ASSIGN_STRAT_FIELD.fieldApiName]: null,
             [ATTENDEES_FIELD.fieldApiName]: null,
             [MULTI_TRAINER_FIELD.fieldApiName]: null,
-            [TRAINING_CONTACT_FIELD.fieldApiName]: null,
+            [CONTACT_FIELD.fieldApiName]: null,
             [TRAINING_INFO_FIELD.fieldApiName]: null,
             [EVENT_LEAD_FIELD.fieldApiName]: null,
             [PLS_FIELD.fieldApiName]: null,
@@ -1473,48 +1575,6 @@ export default class MassEditTable extends LightningElement {
            refreshApex(this.refreshServiceAppointments);
            this.showSpinner = false;
         });
-
-        // Create an array to store the promises for each updateRecord call
-        //const promises = [];
-        // Loop through the updatedRecords array and call updateRecord for each record
-        /*this.changedValues.forEach(record => {
-            this.updateDataValues(record);
-            const recordfields = {
-                fields: record
-            }
-            console.log(recordfields);
-            promises.push(
-                updateRecord(recordfields)
-                    .then(() => {
-                        console.log('Record updated successfully');
-                        this.showToast('Success', 'Records Updated Successfully!', 'success', 'dismissable');
-                        this.draftValues = [];
-                        refreshApex(this.refreshData);
-                        // Handle success
-                    })
-                    .catch(error => {
-                        console.error('Error updating record', error);
-                        console.log(error);
-                        console.log(error.body.output.errors);
-                        this.showToast('Error', 'An Error Occured: ' + error.body.output.errors[0].message, 'error', 'dismissable');
-                        // Handle error
-                    })
-            );
-        });
-        // Wait for all promises to resolve
-        Promise.all(promises)
-            .then(() => {
-                console.log('All records updated successfully');
-                // Handle success for all records
-            })
-            .catch(error => {
-                console.error('Error updating records', error);
-                // Handle error for all records
-            }).finally(() => {
-                refreshApex(this.refreshData);
-                this.showSpinner = false;
-            });
-        this.changedValues = [];*/
     }
 
     handleHeaderAction (event) { //used to enable custom header actions for columns
