@@ -1,0 +1,152 @@
+.cardSpinner{
+    position: relative;
+}
+
+.slds-modal__container{
+    width: 600px;
+    overflow-x: auto;
+}
+
+.saveBar{
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.table-class{
+    width: 90%; /* Set a maximum width to the container */
+    overflow: hidden;
+}
+
+.accordian {
+    width: 100%;
+    padding: 10px;
+}
+
+.accord-button {
+
+}
+
+.row-class {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.accordian-class {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.row-item {
+    width: auto;
+    margin: 5px;
+    vertical-align: bottom;
+    font-weight: bold;
+}
+
+.row-checkitem {
+    width: auto;
+    margin: 5px;
+    vertical-align: middle;
+    font-weight: bold;
+    position: 50px;
+}
+
+th{
+    max-width: 200px;
+    width: fit-content;
+}
+
+.lookup-offset {
+    margin-bottom: 16px;
+}
+
+.slds-modal__footer{
+    display: flex;
+    justify-content: space-between;
+}
+
+.container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 16px; /* Add margin around left and right sides */
+    margin-bottom: 8px; /* Add spacing between this section and the rest of your component */
+    background-color: #f0f0f0;
+}
+
+.container-filter {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 16px; /* Add margin around left and right sides */
+    margin-bottom: 8px; /* Add spacing between this section and the rest of your component */
+    padding: 10px;
+    background-color: #f0f0f0;
+}
+
+.lookup-offset {
+    margin-bottom: 16px;
+}
+
+.discount-offset {
+    margin-bottom: 16px;
+    max-width: 100px;
+}
+
+.picklist-offset {
+    margin-bottom: 25px;
+    max-width: 150px;
+}
+ 
+.input-offset {
+    margin-bottom: 25px;
+    width: 100px;
+}
+
+.picklist-container {
+    display: flex;
+    gap: 16px; /* Add spacing between picklists */
+    align-items: center;
+    width: auto; /* Increase the width of the picklist components */
+    white-space: nowrap;
+}
+
+.picklist-container lightning-combobox {
+    width: auto; /* Increase the width of the picklist components */
+}
+
+.picklist {
+    z-index: 9999;
+    position: static;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 16px;
+    margin-right: 35px;
+    gap: 16px; /* Add spacing between buttons */
+    align-items: center;
+}
+
+.slds-table tr td:first-child {
+    position:sticky;
+    z-index: 1
+}
+
+.THIS .slds-scrollable_x
+{overflow-y:visible!important;overflow-x:visible!important;}
+.THIS .slds-scrollable_y {
+    min-height: 150px;
+}
+
+.slds-scrollable_y, .slds-scrollable--y {
+    -webkit-overflow-scrolling: touch;
+    max-height: 50%;
+    /* overflow: hidden; */
+    /* overflow-y: auto; */
+}

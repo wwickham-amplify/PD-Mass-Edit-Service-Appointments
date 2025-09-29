@@ -1,0 +1,294 @@
+<template>
+    <lightning-card variant="Narrow">
+        <lightning-card title="Service Appointments" icon-name="utility:table"></lightning-card>
+
+        <lightning-layout-item size="12" padding="around-small">
+            <b>  Filter</b>
+            <div class="container-filter">
+                <div class="row-class">
+                    <div class="row-item">
+                        <lightning-record-edit-form object-api-name='Lead'>
+                            <lightning-input-field field-name='Account__c' value={accountFilter} onchange={accountFilterChange} data-id="input"></lightning-input-field> 
+                        </lightning-record-edit-form>
+                    </div>
+                 <!--   <div class="row-item">
+                        <c-reusable-lookup label="Account Lookup" selected-icon-name="standard:account" object-label="Account"
+                        object-api-name="Account" field-api-name="Name" other-field-api-name="County_Name__c"
+                        onvalueselected={handleValueSelectedOnAccount}>
+                        </c-reusable-lookup>
+                    </div>-->
+                    <div class="row-item">
+                        <lightning-record-edit-form object-api-name='ServiceAppointment'>
+                            <lightning-input-field field-name='Work_Order__c' value={workOrderFilter} onchange={workOrderFilterChange} data-id="input"></lightning-input-field> 
+                        </lightning-record-edit-form>
+                    </div>
+                    <div class="row-item">
+                        <lightning-combobox name="Status" label="Status"  options={statusOptions} value={statusFilter} placeholder="--None--" dropdown-alignment="auto" onchange={statusFilterChange}> </lightning-combobox>
+                    </div>
+                    <div class="row-item">           
+                        <lightning-input type='text' name="Product_Family__c" label="Product Family" value={productFamilyFilter} placeholder="Enter..." onchange={productFamilyFilterChange}> </lightning-input>
+                    </div> 
+                </div>
+            </div>
+        </lightning-layout-item>
+
+        <lightning-card variant="Narrow" class="cardSpinner">
+            <div if:true={showSpinner}>
+                <lightning-spinner alternative-text="Loading..." variant="brand">
+                </lightning-spinner>
+            </div>
+        <lightning-layout-item size="12" padding="around-small">
+            <b>Mass Edit</b>
+            <div class="container">
+                <div class="button-container">
+                    <lightning-button-icon variant="brand" size="medium" icon-name="utility:record_alt"
+                        alternative-text="Save Changes" onclick={updateProducts}
+                        disabled={disabled}></lightning-button-icon>
+                        <lightning-button-icon variant="border" size="medium" icon-name="utility:clear"
+                        alternative-text="Reset fields" onclick={clearFields}
+                        ></lightning-button-icon>
+                </div>
+                <div class="accordian">
+                    <div class="accord-button">
+                        <lightning-button label={detailsLabel} variant="brand" title="Toggle details collapse" onclick={handleDetailToggle}></lightning-button>
+                    </div>
+                <lightning-accordion allow-multiple-sections-open onsectiontoggle={handleSectionToggle} active-section-name={activeSections}>
+                    <lightning-accordion-section name="A" label="Training Details">
+                        <div class="accordian-class">
+                        <div class="row-class">    
+                            <div class="row-item">                     
+                                <lightning-input data-recid="massEdit" type='date' name="Date_to_Schedule__c" label="Date to Schedule" value={dateValue} placeholder="--None--" onchange={handleChange}> </lightning-input>
+                            </div>        
+                            <div class="row-item">                          
+                                <lightning-input data-recid="massEdit" type='date' name="Preferred_Training_Date_1__c" label="Preferred Training Date 1" value={prefDateValue} placeholder="--None--" onchange={handleChange}> </lightning-input>
+                            </div>  
+                            <div class="row-item">                   
+                                <lightning-combobox data-recid="massEdit" class='picklist' name="Required_Local_Start_Time__c" label="Required Start Time"  options={reqStartOptions} value={reqStartValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
+                            </div>   
+                            <div class="row-item">  
+                                <lightning-combobox data-recid="massEdit" class='picklist' name="Required_Local_End_Time__c" label="Required End Time"  options={reqEndOptions} value={reqEndValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
+                            </div>  
+                            <div class="row-item">     
+                                <lightning-combobox data-recid="massEdit" class='picklist' name="Training_Type__c" label="Training Type"  options={trainingTypeOptions} value={trainingTypeValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
+                            </div> 
+                            <div class="row-item">          
+                                <lightning-textarea data-recid="massEdit" type='text' name="SA_Notes__c" label="Service Appointment Notes" value={sANotes} placeholder="Enter..." onchange={handleChange}> </lightning-textarea>
+                            </div>  
+                        </div>
+                        <div class="row-class">
+                            <lightning-button label={trainingLabel} variant="brand" title="Toggle content action" onclick={handleTrainingToggle}></lightning-button>
+                        </div> 
+                    </div>
+                    </lightning-accordion-section>
+                    <lightning-accordion-section name="B" label="Account Contact Information">
+                        <div class="accordian-class">
+                        <div class="row-class">    
+                            <div class="row-item">   
+                                <lightning-record-edit-form object-api-name='ServiceAppointment' onload={onLoad}>
+                                <lightning-input-field data-recid="massEdit" field-name='ContactId' value={trainingContactValue} onchange={handleLookupChange} data-id="input"></lightning-input-field> 
+                                </lightning-record-edit-form>
+                            </div>   
+                            <div class="row-item">          
+                                <lightning-textarea data-recid="massEdit" type='text' name="Training_Contact_Information__c" label="Training Contact Information" value={trainingInfoValue} placeholder="Enter..." onchange={handleChange}> </lightning-textarea>
+                            </div>    
+                            <div class="row-item">   
+                                <lightning-record-edit-form object-api-name='ServiceAppointment'>
+                                <lightning-input-field data-recid="massEdit" field-name='Assigned_PD_Strategist__c' value={assignStratValue} onchange={handleLookupChange} data-id="input"></lightning-input-field> 
+                                </lightning-record-edit-form>
+                            </div>    
+                            <div class="row-item">   
+                                <lightning-record-edit-form object-api-name='ServiceAppointment'>
+                                <lightning-input-field data-recid="massEdit" field-name='Multi_Trainer_Event_Lead__c' value={eventLeadValue} onchange={handleLookupChange} data-id="input"></lightning-input-field> 
+                                </lightning-record-edit-form>
+                            </div>  
+                            <div class="row-checkitem">          
+                                <lightning-combobox data-recid="massEdit" type='picklist' name="Multi_Trainer_Event__c" label="Multi-Trainer Event" options={multiTrainerOptions} value={multiTrainerValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleTrainerCheckboxChange}> </lightning-combobox>
+                            </div>    
+                            <div class="row-item">          
+                                <lightning-textarea data-recid="massEdit" type='text' name="Multi_Trainer_Event_Details__c" label="Multi-Trainer Event Details" value={multiTrainerDetailsValue} placeholder="Enter..." onchange={handleChange}> </lightning-textarea>
+                            </div>    
+                            <!--
+                            <div class="row-item">           
+                                <lightning-input data-recid="massEdit" type='text' name="Multi_Trainer_Event_Details__c" label="Multi-Trainer Event Details" value={multiTrainerDetailsValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div> 
+                            -->
+                            <div class="row-item">         
+                                <lightning-combobox data-recid="massEdit" class='picklist' name="PLS_Confirmation_status__c" label="PLS Confirmation Status"  options={plsOptions} value={plsValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
+                            </div>
+                        </div>
+                        <div class="row-class">
+                            <lightning-button label={accountLabel} variant="brand" title="Toggle account action" onclick={handleAccountToggle}></lightning-button>
+                        </div>
+                        </div>
+                    </lightning-accordion-section>
+                    <lightning-accordion-section name="C" label="Session Details">
+                        <div class="accordian-class">
+                        <div class="row-class">    
+                            <div class="row-item"> 
+                                <lightning-dual-listbox data-recid="massEdit" name="Type_of_Attendees__c" label="Select Attendees Type" source-label="Available" selected-label="Selected" options={attendeesTypeOptions} onchange={handleTypeChange} disable-reordering="true"></lightning-dual-listbox>
+                            </div>
+                            <div class="row-item"> 
+                                <lightning-dual-listbox data-recid="massEdit" name="Participating_Grades__c" label="Select Participating Grades" source-label="Available" selected-label="Selected" options={gradeOptions} onchange={handleGradeChange} disable-reordering="true"></lightning-dual-listbox>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='number' name="Number_of_Attendees__c" label="Number of Attendees" value={attendeesValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Virtual_Training_Link__c" label="Virtual Training Link" value={virtualTrainingValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Digital_Entitlement_Licenses__c" label="Digital Entitlement Licenses" value={licenseValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Additional_Information__c" label="Additional Information" value={informationValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Subject" label="Subject" value={subjectValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                          
+                                <lightning-input data-recid="massEdit" type='text' name="Session_Topic__c" label="Session Topic" value={sessionTopicValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-checkitem">                           
+                                <lightning-combobox data-recid="massEdit" type='picklist' name="Digital_Experience_IC__c" label="Digital Experience IC" options={digitalOptions} value={digitalValue} placeholder="--None--" onchange={handleDigitalCheckboxChange} dropdown-alignment="auto"> </lightning-combobox>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='number' name="Session_Value__c" label="Session Value" value={sessionValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                        </div> 
+                        <div class="row-class">
+                            <lightning-button label={sessionLabel} variant="brand" title="Toggle session action" onclick={handleSessionToggle}></lightning-button>
+                        </div>
+                        </div>
+                    </lightning-accordion-section>
+                    <lightning-accordion-section name="D" label="Address Information">
+                        <div class="accordian-class">
+                        <div class="row-class">
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Training_Location__c" label="Training Location" value={trainingLocationValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                   
+                                <lightning-combobox data-recid="massEdit" class='picklist' name="Training_Location_Status__c" label="Training Location Status"  options={locationStatusOptions} value={locationStatusValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
+                            </div>   
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Shipping_Street__c" label="Shipping Street" value={shippingStreetValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Shipping_City__c" label="Shipping City" value={shippingCityValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Shipping_Postal_Code__c" label="Shipping Postal Code" value={shippingPostalValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Shipping_State__c" label="Shipping State" value={shippingStateValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">                         
+                                <lightning-input data-recid="massEdit" type='text' name="Shipping_Country__c" label="Shipping Country" value={shippingCountryValue} placeholder="Enter..." onchange={handleChange}> </lightning-input>
+                            </div>
+                            <div class="row-item">         
+                                <lightning-combobox data-recid="massEdit" class='picklist' name="Shipping_Status__c" label="Shipping Status"  options={shippingStatusOptions} value={shippingStatusValue} placeholder="--None--" dropdown-alignment="auto" onchange={handleChange}> </lightning-combobox>
+                            </div>
+                            <div class="row-item">          
+                                <lightning-textarea data-recid="massEdit" type='text' name="Special_Shipping_Instructions__c" label="Special Shipping Instructions" value={shippingInstructionsValue} placeholder="Enter..." onchange={handleChange}> </lightning-textarea>
+                            </div>  
+                        </div>
+                        <div class="row-class">
+                            <lightning-button label={addressLabel} variant="brand" title="Toggle address action" onclick={handleAddressToggle}></lightning-button>
+                        </div>
+                        </div>
+                    </lightning-accordion-section>
+                </lightning-accordion>
+                </div>
+                    <!--
+                 <div class="picklist-container">
+                    <lightning-button-icon variant="base" size="medium" icon-name="utility:edit"
+                    alternative-text="Change Product" onclick={updateProducts}
+                    disabled={disabled}></lightning-button-icon>
+                    <div class="lookup-offset">
+                            <lightning-record-edit-form object-api-name='Opportunity'>
+                               <lightning-input-field field-name='AccountId' value={schoolLookupValue}
+                                    onchange={handleSchoolLookupChange} data-id="input">
+                                </lightning-input-field> 
+                            </lightning-record-edit-form>
+                        </div>
+                        
+                        <div class="input-offset">
+                            <lightning-input type="number" formatter="percent-fixed" name="discount" value={discountValue} onchange={handleDiscountChange} placeholder="Enter..." label="Discount" ></lightning-input>
+                        </div>
+                    
+                        <div class="picklist-offset">
+
+                            <lightning-combobox name="subjectArea" label="Subject Area" value={subjectAreaValue}
+                                placeholder="All" dropdown-alignment="auto" options={subjectAreaPickListOptions}
+                                onchange={handleSubjectAreaChange}> </lightning-combobox>
+                        </div>
+                        <div class="picklist-offset">
+
+                            <lightning-combobox name="productType" label="Product Type" value={productTypeValue}
+                                placeholder="All" dropdown-alignment="auto" options={productTypePickListOptions}
+                                onchange={handleProductTypeChange}> </lightning-combobox>
+                            </div>
+                            <div class="picklist-offset">
+                            <lightning-combobox name="course" label="Course" value={courseValue} placeholder="All"
+                                dropdown-alignment="auto" options={coursePickListOptions} onchange={handleCourseChange}> </lightning-combobox>
+                            </div>
+                            <div class="picklist-offset">
+                            <lightning-combobox name="grade" label="Grade" value={gradeValue} placeholder="All"
+                                dropdown-alignment="auto" options={gradePickListOptions} onchange={handleGradeChange}> </lightning-combobox>
+                            </div>
+                          <div class="input-offset">
+                                <lightning-input type="number" name="numberOfWeeks" value={numberOfWeeksValue} onchange={handleNumberOfWeeksChange} placeholder="Enter..." label="No. of Weeks" ></lightning-input>
+                            </div> 
+                            <div class="input-offset">
+                                <lightning-input type="date" name="startDate" value={startDateValue} onchange={handleStartDateChange} placeholder="Enter..." label="Req. Start Date" ></lightning-input>
+                            </div>
+                           <div class="input-offset">
+                                <lightning-input type="number" name="numberOfStudents" value={numberOfStudentsValue} onchange={handleNumberOfStudentsChange} placeholder="Enter..." label="No. of Students" field-level-help="Number of Students Per Period" ></lightning-input>
+                            </div> 
+                            <div class="picklist-offset">
+                                <lightning-combobox name="stateCertReq" label="State Certification Required" value={stateCertReqValue} placeholder="All"
+                                    dropdown-alignment="auto" options={stateCertReqPickListOptions} onchange={handleStateCertReqChange}> </lightning-combobox>
+                                </div>
+
+                            <lightning-button-icon variant="base" size="small" icon-name="utility:clear"
+                                alternative-text="Clear" onclick={clearFilters}></lightning-button-icon>
+                                
+                            <lightning-button-icon variant="base" size="small" icon-name="utility:edit"
+                                alternative-text="Create Order" onclick={createOrder}></lightning-button-icon> -->
+            </div>
+
+        </lightning-layout-item>
+        <div if:true={showHeader}>
+            <div class="saveBar">
+                <lightning-button label="Cancel" title="Non-primary action" onclick={handleCancel} class="slds-m-left_x-small"></lightning-button>
+                <lightning-button variant="brand" label="Save" title="Primary action" onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+            </div>
+        </div>
+        <lightning-layout style="height:500px">
+            <lightning-layout-item size=12>
+            <c-l-w-c-lookup-custom-datatable-type
+                key-field="Id" 
+                data={serviceAppointments} 
+                columns={columns}
+                onrowaction={handleRowAction} 
+                onlookupchanged={lookupChanged} 
+                onvalueselect={handleSelection}
+                oncellchange={handleCellChange} 
+                oncancel={handleCancel} 
+                onrowselection={handleRowSelection}
+                draft-values={draftValues} 
+                onsave={handleSave} 
+                enable-infinite-loading
+                onloadmore={loadMoreData}
+                onheaderaction={handleHeaderAction}
+                onpicklistchanged={multpicklistChanged}
+                onpicklistchangedgrade={multipicklistChangedGrade}
+                suppress-bottom-bar>
+            </c-l-w-c-lookup-custom-datatable-type>
+            <template if:true={noData}>
+                <p style="position: relative;top: -450px;left: 265px;">{errorMessage}</p>
+            </template>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-card>
+    </lightning-card>
+</template>
