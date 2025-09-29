@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This Lightning Message Channel sends information about selected records 
+    from the custom datatables to the custom columns. This is used for conditional logic to
+    display the &quot;Apply changes to all selected rows&quot; dropdown.</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>message To Send</description>
+        <fieldName>messageToSend</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>My source?</description>
+        <fieldName>sourceSystem</fieldName>
+    </lightningMessageFields>
+    <masterLabel>selectedRecords</masterLabel>
+</LightningMessageChannel>

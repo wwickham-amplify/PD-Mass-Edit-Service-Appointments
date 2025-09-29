@@ -84,10 +84,10 @@
                         <div class="accordian-class">
                         <div class="row-class">    
                             <div class="row-item">   
-                                <lightning-record-edit-form object-api-name='ServiceAppointment' onload={onLoad}>
+                                <lightning-record-edit-form object-api-name='ServiceAppointment'>
                                 <lightning-input-field data-recid="massEdit" field-name='ContactId' value={trainingContactValue} onchange={handleLookupChange} data-id="input"></lightning-input-field> 
                                 </lightning-record-edit-form>
-                            </div>   
+                            </div>
                             <div class="row-item">          
                                 <lightning-textarea data-recid="massEdit" type='text' name="Training_Contact_Information__c" label="Training Contact Information" value={trainingInfoValue} placeholder="Enter..." onchange={handleChange}> </lightning-textarea>
                             </div>    

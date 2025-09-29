@@ -14,7 +14,9 @@ export default class MultipicklistColumn extends LightningElement {
         if (!this.isRendered) {
             Promise.all([
                 loadStyle(this, LWCDatatableMultiPicklist),
-            ]).then(() => { });
+            ]).then(() => { }).catch(error => {
+                console.log('error', error);
+            });
         }
         this.isRendered = true;
     }
