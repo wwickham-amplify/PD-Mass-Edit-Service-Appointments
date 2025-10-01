@@ -115,6 +115,11 @@ th{
     white-space: nowrap;
 }
 
+.comboBoxStyle {
+    padding: 0 var(--lwc-spacingXxsmall, 0.25rem);
+    margin-bottom: var(--lwc-spacingXsmall, 0.5rem);
+}
+
 .picklist-container lightning-combobox {
     width: auto; /* Increase the width of the picklist components */
 }

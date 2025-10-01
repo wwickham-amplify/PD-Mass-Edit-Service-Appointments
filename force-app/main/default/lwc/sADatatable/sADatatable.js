@@ -6,7 +6,7 @@ import { updateRecord } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { publish, MessageContext } from 'lightning/messageService';
-import updateRecords from '@salesforce/apex/FSL_SA_MASS_Edit.updateRecords';
+import updateRecords from '@salesforce/apex/ServiceAppointmentMassEditController.updateRecords';
 import recordSelected from '@salesforce/messageChannel/selectedRecords__c';
 import SERVICE_APPOINTMENT from '@salesforce/schema/ServiceAppointment';
 import STATUS_FIELD from '@salesforce/schema/ServiceAppointment.Status';
@@ -44,6 +44,7 @@ import MULTI_DETAIL_FIELD from '@salesforce/schema/ServiceAppointment.Multi_Trai
 import TRAINER_ASSIGN_FIELD from '@salesforce/schema/ServiceAppointment.Trainer_Mass_Assign__c';
 import NOTES_FIELD from '@salesforce/schema/ServiceAppointment.SA_Notes__c';
 import LOCATION_FIELD from '@salesforce/schema/ServiceAppointment.Training_Location_Status__c';
+import WORK_ORDER_FIELD from '@salesforce/schema/ServiceAppointment.Work_Order__c'
 //import ATTENDEES_TYPE_FIELD from '@salesforce/schema/ServiceAppointment.Type_of_Attendees__c';
  
 const columns = [
@@ -538,6 +539,7 @@ export default class MassEditTable extends LightningElement {
         {
             label: "Training Details",
             name: 'trainingDetails',
+            buttonLabel: 'Expand Training Details',
             fields: [
                 { apiName: DATE_TO_SCHEDULE_FIELD, value: null },
                 { apiName: PREF_DATE_FIELD, value: null },
@@ -550,12 +552,13 @@ export default class MassEditTable extends LightningElement {
         {
             label: "Account Contact Information",
             name: "accountContactInformation",
+            buttonLabel: 'Expand Account Contact Information',
             fields: [
                 { apiName: CONTACT_FIELD, value: null },
                 { apiName: TRAINING_INFO_FIELD, value: null },
                 { apiName: ASSIGN_STRAT_FIELD, value: null },
                 { apiName: EVENT_LEAD_FIELD, value: null },
-                { apiName: MULTI_TRAINER_FIELD, value: null, typeBool: true },
+                { apiName: MULTI_TRAINER_FIELD, name: 'Multi-Trainer Event', value: null, typeBool: true },
                 { apiName: MULTI_DETAIL_FIELD, value: null },
                 { apiName: PLS_FIELD, value: null }
             ]
@@ -563,6 +566,7 @@ export default class MassEditTable extends LightningElement {
         {
             label: "Session Details",
             name: "sessionDetails",
+            buttonLabel: 'Expand Session Details',
             fields: [
                 { apiName: ATTENDEES_TYPE_FIELD, value: null },
                 { apiName: GRADE_FIELD, value: null },
@@ -572,13 +576,14 @@ export default class MassEditTable extends LightningElement {
                 { apiName: INFORMATION_FIELD, value: null },
                 { apiName: SUBJECT_FIELD, value: null },
                 { apiName: SESSION_TOPIC_FIELD, value: null },
-                { apiName: DIGITAL_FIELD, value: null, typeBool: true },
+                { apiName: DIGITAL_FIELD, name: 'Digital Experience (IC)', value: null, typeBool: true },
                 { apiName: SESSION_VAL_FIELD, value: null }
             ]
         },
         {
             label: "Address Information",
             name: "addressInformation",
+            buttonLabel: 'Expand Address Information',
             fields: [
                 { apiName: TRAINING_LOCATION_FIELD, value: null },
                 { apiName: LOCATION_FIELD, value: null },
@@ -592,6 +597,33 @@ export default class MassEditTable extends LightningElement {
             ]
         }
     ];
+
+    toggleColumns(e) {
+        const sectionName = e.target.dataset.id;
+        const sectionDetails = this.organizedFields.find(i => i.name === sectionName);
+
+        if (sectionDetails) {
+            if (sectionDetails.buttonLabel.startsWith('Expand')) {
+                sectionDetails.buttonLabel = `Collapse ${sectionDetails.label}`;
+
+                sectionDetails.fields.forEach(field => {
+                    const matchingColumn = this.columns.find(c => c.fieldName === field.apiName.fieldApiName);
+                    matchingColumn.initialWidth = 150;
+                });
+            } else {
+                sectionDetails.buttonLabel = `Expand ${sectionDetails.label}`;
+
+                sectionDetails.fields.forEach(field => {
+                    const matchingColumn = this.columns.find(c => c.fieldName === field.apiName.fieldApiName);
+                    matchingColumn.initialWidth = 50;
+                });
+            }
+        }
+
+        //trigger reactivity
+        this.organizedFields = [...this.organizedFields];
+        this.columns = [...this.columns];
+    }
 
     //getting options for picklists
     @wire(getPicklistValues, {
@@ -781,7 +813,7 @@ export default class MassEditTable extends LightningElement {
     }
 
     handleBooleanChange(e) {
-        this.bulkFieldsChanged(e.detail.name, e.detail.value);
+        this.bulkFieldsChanged(e.currentTarget.name, e.detail.value);
     }
 
     bulkFieldsChanged(fieldName, fieldValue) {
@@ -803,11 +835,11 @@ export default class MassEditTable extends LightningElement {
             };
         }
 
-        console.log('Changed fields: ', this.changedFields);
+        //console.log('Changed fields: ', this.changedFields);
     }
 
     //handles header field changes
-    handleChange(event) {
+    /*handleChange(event) {
         console.log(event);
         for (const field in this.massFields) {
             if (this.massFields.hasOwnProperty(event.target.name)) {
@@ -816,7 +848,7 @@ export default class MassEditTable extends LightningElement {
             }
         }
         console.log('massFields: ' + JSON.stringify(this.massFields));
-    }
+    }*/
 
     //handles checkboxes uses event.target.checked
     handleTrainerCheckboxChange(event) {
@@ -910,12 +942,29 @@ export default class MassEditTable extends LightningElement {
         console.log('massFields: ' + JSON.stringify(this.massFields));
     }
 
-    //resets all field values
     clearFields() {
+        //Reset the values in the organized fields array
+        this.organizedFields.forEach(section => {
+            section.fields.forEach(field => {
+                field.value = null
+                //Update the changedFields array
+                this.bulkFieldsChanged(field.apiName.fieldApiName, null);
+            });
+        });
+        this.organizedFields = [...this.organizedFields];
+
+        //Reset the values in the HTML
+        const inputFields = this.template.querySelectorAll('[data-group="massEditFields"]');
+        if (inputFields) {
+            inputFields.forEach(field => {
+                field.value = null;
+            });
+        }
+
         //for (const field in this.massFields) {
         //    this.massFields[field] = null;
         //}
-        this.template.querySelectorAll('lightning-input[data-recid=massEdit]').forEach(element => {
+        /*this.template.querySelectorAll('lightning-input[data-recid=massEdit]').forEach(element => {
             if(element.type === 'checkbox' || element.type === 'checkbox-button'){
                 element.checked = false;
             }else{
@@ -1002,12 +1051,19 @@ export default class MassEditTable extends LightningElement {
             [MULTI_DETAIL_FIELD.fieldApiName]: null,
             [NOTES_FIELD.fieldApiName]: null,
             [LOCATION_FIELD.fieldApiName]: null,
-        }
+        }*/
     }
 
+    selectedRowIds = [];
+
     //handles selection of row using checkbox
-    handleRowSelection(event) {
-        const selectedRows = event.detail.selectedRows;
+    handleRowSelection(e) {
+        const selectedRows = [...e.detail.selectedRows];
+       
+        this.selectedRowIds = [...new Set(selectedRows.map(row => row.Id))];
+        //console.log(this.selectedRowIds);
+        this.selectedRowIds.length > 0 ? this.disabled = false : this.disabled = true;
+        /*const selectedRows = event.detail.selectedRows;
         console.log(selectedRows);
         this.selectedRecords = [...selectedRows];
         this.selectedRowIds = [];
@@ -1022,11 +1078,11 @@ export default class MassEditTable extends LightningElement {
             this.disabled = false;
             this.recordsSelected = true;
         };
-        this.handleSelectedRows();
+        this.handleSelectedRows();*/
     }
 
     recordsSelected = false; //determines whether to show the "Apply to (1) Row" dropdown
-    selectedRowIds = []; //a list of selected row ids
+    //selectedRowIds = []; //a list of selected row ids
 
     //sends the event telling custom columns which rows are selected
     handleSelectedRows(event) {
@@ -1482,9 +1538,90 @@ export default class MassEditTable extends LightningElement {
         console.log("this.serviceAppointments: ", this.serviceAppointments);
     }
 
-    //updates selected rows based on field values when edit button is clicked
-    updateProducts() {
-        this.showSpinner = true;
+    //When fields are edited from the page sections; create a collection of objects storing edited fields and add each selected record Id
+    createDraftRecords() {
+        const draftRecords = this.selectedRowIds.map(id => ({
+            Id: id,
+            ...this.changedFields
+        }));
+        this.updateRecords(draftRecords);
+    }
+
+    updateRecords(draftRecords) {
+        if(draftRecords) {
+            console.log('Table of records about to be updated: ');
+            console.table(draftRecords);
+            if(draftRecords.length > 0) {
+                //Only return the results that have an Id and at least one other field
+                const recordsToUpdate = draftRecords.filter(record => {
+                    const fields = Object.keys(record);
+                    return (fields.length > 1 && fields.includes('Id'));
+                });
+                /*********Passed all error checks and ready for update*************/
+                if(recordsToUpdate.length > 0) {
+                    updateRecords({ records: recordsToUpdate })
+                        .then(results => {
+                            const successCount = results.filter(r => r.success).length;
+                            const errorResults = results.filter(r => !r.success);
+
+                            if (successCount > 0) {
+                                let message = new ShowToastEvent({
+                                    title: 'Success',
+                                    message: `${successCount} record${successCount > 1 ? 's' : ''} updated successfully`,
+                                    variant: 'success',
+                                    mode: 'dismissible'
+                                });
+                                this.dispatchEvent(message);
+                            }
+
+                            if (errorResults.length > 0) {
+                                let errorMessage = errorResults
+                                    .map(r => `Record ${r.recordId} failed to update: ${r.errorMessages.join('; ')}`)
+                                    .join(', ');
+
+                                let message = new ShowToastEvent({
+                                    title: 'Error',
+                                    message: errorMessage,
+                                    variant: 'error',
+                                    mode: 'sticky'
+                                });
+                                this.dispatchEvent(message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Apex call failed: ', error);
+                        })
+                } else {
+                    let message = new ShowToastEvent({
+                        title: 'Error',
+                        message: 'No fields were edited. Please select at least one record and edit at least one field.',
+                        variant: 'error',
+                        mode: 'sticky'
+                    });
+                    this.dispatchEvent(message);
+                    console.log('"draftRecords" either didnt contain any Ids, or had no fields to update: ' + draftRecords);
+                }
+            } else {
+                let message = new ShowToastEvent({
+                    title: 'Error',
+                    message: 'No records selected to be updated. Please select at least row on the table below.',
+                    variant: 'error',
+                    mode: 'sticky'
+                });
+                this.dispatchEvent(message);
+                console.log('0 records were included in "draftRecords": ' + draftRecords);
+            }
+        } else {
+            let message = new ShowToastEvent({
+                title: 'Error',
+                message: 'No records provided to be updated.',
+                variant: 'error',
+                mode: 'sticky'
+            });
+            this.dispatchEvent(message);
+            console.log('Falsy value returned for "draftRecords": ' + draftRecords);
+        }
+        /*this.showSpinner = true;
         this.changedValues = this.selectedRecords.map(item => ({ Id: item.Id}));
         console.log(this.changedValues); //the selected values to be changed
         this.changedValues.forEach(item => {
@@ -1574,7 +1711,7 @@ export default class MassEditTable extends LightningElement {
         }).finally(() => {
            refreshApex(this.refreshServiceAppointments);
            this.showSpinner = false;
-        });
+        });*/
     }
 
     handleHeaderAction (event) { //used to enable custom header actions for columns
@@ -1610,7 +1747,8 @@ export default class MassEditTable extends LightningElement {
             }
         }
     }
-    trainingLabel = "Expand Training Details"
+
+    /*trainingLabel = "Expand Training Details"
     handleTrainingToggle (){
         if (this.trainingLabel == "Expand Training Details") {
             this.trainingLabel = "Collapse Training Details"
@@ -1681,7 +1819,7 @@ export default class MassEditTable extends LightningElement {
 
     handleSectionToggle() {
         console.log('toggle');
-    }
+    }*/
 
 /*************************************************************************************/
     //call this function to display a toast message to the user

@@ -42,11 +42,12 @@
             <div class="container">
                 <div class="button-container">
                     <lightning-button-icon variant="brand" size="medium" icon-name="utility:record_alt"
-                        alternative-text="Save Changes" onclick={updateProducts}
-                        disabled={disabled}></lightning-button-icon>
-                        <lightning-button-icon variant="border" size="medium" icon-name="utility:clear"
-                        alternative-text="Reset fields" onclick={clearFields}
-                        ></lightning-button-icon>
+                        alternative-text="Save Changes" onclick={createDraftRecords}
+                        disabled={disabled}>
+                    </lightning-button-icon>
+                    <lightning-button-icon variant="border" size="medium" icon-name="utility:clear"
+                        alternative-text="Reset fields" onclick={clearFields}>
+                    </lightning-button-icon>
                 </div>
                 <div class="accordian">
                     <div class="accord-button">
@@ -54,31 +55,45 @@
                     </div>
 
                     <lightning-record-edit-form object-api-name={objectApiName}>
-                        <lightning-accordion allow-multiple-sections-open onsectiontoggle={handleSectionToggle} active-section-name={activeSections}>
+                        <lightning-accordion allow-multiple-sections-open>
                             <template for:each={organizedFields} for:item="section">
                                 <lightning-accordion-section key={section.name} name={section.name} label={section.label}>
                                     <div class="slds-grid slds-wrap slds-gutters">
-                                        <template for:each={section.fields} for:item="field">
-                                            <div key={field.apiName} class="slds-col slds-size_1-of-2">
-                                                <template lwc:if={field.typeBool}>
-                                                    <lightning-combobox
-                                                        label={field.apiName}
-                                                        name={field.apiName}
-                                                        value={field.value}
-                                                        options={booleanOptions}
-                                                        placeholder="--None--" dropdown-alignment="auto"
-                                                        onchange={handleFieldChange}>
-                                                    </lightning-combobox>
-                                                </template>
-                                                <template lwc:else>
-                                                    <lightning-input-field
-                                                        field-name={field.apiName}
-                                                        value={field.value}
-                                                        onchange={handleFieldChange}>
-                                                    </lightning-input-field>
+                                        <div class="slds-col slds-size_4-of-5">
+                                            <div class="slds-grid slds-wrap slds-gutters">
+                                                <template for:each={section.fields} for:item="field">
+                                                    <div key={field.apiName} class="slds-col slds-size_1-of-2">
+                                                        <template lwc:if={field.typeBool}>
+                                                            <!--Booleam fields are handled differently; display as a picklist with a "None" option-->
+                                                            <lightning-combobox
+                                                                label={field.name}
+                                                                name={field.apiName.fieldApiName}
+                                                                value={field.value}
+                                                                options={booleanOptions}
+                                                                placeholder="--None--" dropdown-alignment="auto"
+                                                                onchange={handleBooleanChange}
+                                                                class="comboBoxStyle"
+                                                                data-group="massEditFields"
+                                                                data-api-name={field.apiName.fieldApiName}>
+                                                            </lightning-combobox>
+                                                        </template>
+                                                        <template lwc:else>
+                                                            <lightning-input-field
+                                                                field-name={field.apiName}
+                                                                data-id={field.apiName}
+                                                                value={field.value}
+                                                                onchange={handleFieldChange}
+                                                                data-group="massEditFields"
+                                                                data-api-name={field.apiName}>
+                                                            </lightning-input-field>
+                                                        </template>
+                                                    </div>
                                                 </template>
                                             </div>
-                                        </template>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-5" style="align-self: center">
+                                            <lightning-button label={section.buttonLabel} variant="brand" title="Collapse/Expand fields on table" data-id={section.name} onclick={toggleColumns}></lightning-button>
+                                        </div>
                                     </div>
                                 </lightning-accordion-section>
                             </template>
