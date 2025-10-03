@@ -46,69 +46,113 @@ import NOTES_FIELD from '@salesforce/schema/ServiceAppointment.SA_Notes__c';
 import LOCATION_FIELD from '@salesforce/schema/ServiceAppointment.Training_Location_Status__c';
 import WORK_ORDER_FIELD from '@salesforce/schema/ServiceAppointment.Work_Order__c'
 //import ATTENDEES_TYPE_FIELD from '@salesforce/schema/ServiceAppointment.Type_of_Attendees__c';
- 
+
 const columns = [
     { 
-        label: 'Name', fieldName: 'AppointmentNumberUrl', type: 'url', 
-        typeAttributes: { label: { fieldName: "AppointmentNumber" }, tooltip:"Appointment Number", target: "_blank" }, initialWidth: 150, 
-        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' },], 
-        hideDefaultActions: true 
-    },
-    {
-        label: 'Account', fieldName: 'AccountId', type: 'lookupColumn', initialWidth: 50, editable: false,
-        typeAttributes: { object: 'ServiceAppointment', fieldName: 'AccountId', value: { fieldName: 'AccountId' }, context: { fieldName: 'Id' }, name: 'Account', fields: ['Account.Name'], edit: false, target: '_self'}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true
+        label: 'Name', type: 'lookupColumn', fieldName: 'Id',
+        typeAttributes: { 
+            recordId: { fieldName: "Id"},
+            fieldApiName: "Id",
+            nameField: "ServiceAppointment.AppointmentNumber"
+        }, 
+        editable: false, initialWidth: 150, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' }] 
     },
     { 
-        label: 'Work Order', fieldName: 'Work_Order__c', type: 'lookupColumn', initialWidth: 50, editable: false, 
-        typeAttributes: {object: 'ServiceAppointment', fieldName: 'Work_Order__c', value: { fieldName: 'Work_Order__c' }, context: { fieldName: 'Id' }, name: 'WorkOrder', fields: ['WorkOrder.WorkOrderNumber'], edit: false, target: '_self'}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true 
+        label: 'Account', type: 'lookupColumn', fieldName: 'AccountId',
+        typeAttributes: { 
+            recordId: { fieldName: "AccountId"},
+            fieldApiName: "AccountId",
+            nameField: "Account.Name"
+        }, 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' }] 
     },
     { 
-        label: 'Work Order Line Item', fieldName: 'Work_Order_Line_Item__c', type: 'lookupColumn', initialWidth: 50, editable: false, 
-        typeAttributes: {object: 'ServiceAppointment', fieldName: 'Work_Order_Line_Item__c', value: { fieldName: 'Work_Order_Line_Item__c' }, context: { fieldName: 'Id' }, name: 'WorkOrderLineItem', fields: ['WorkOrderLineItem.LineItemNumber'], edit: false, target: '_self'}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], hideDefaultActions: true 
+        label: 'Work Order', type: 'lookupColumn', fieldName: 'Work_Order__c',
+        typeAttributes: { 
+            recordId: { fieldName: "Work_Order__c"},
+            fieldApiName: "Work_Order__c",
+            nameField: "WorkOrder.WorkOrderNumber"
+        }, 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' }] 
     },
     { 
-        label: 'Training Product Delivered', fieldName: 'Training_Product_Delivered__c', type: 'lookupColumn', initialWidth: 50, editable: false,
-        typeAttributes: {object: 'ServiceAppointment', fieldName: 'Training_Product_Delivered__c', value: { fieldName: 'Training_Product_Delivered__c' }, context: { fieldName: 'Id' }, name: 'Product2', fields: ['Product2.Name'], edit: false, target: '_self'}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], hideDefaultActions: true 
+        label: 'Work Order Line Item', type: 'lookupColumn', fieldName: 'Work_Order_Line_Item__c',
+        typeAttributes: { 
+            recordId: { fieldName: "Work_Order_Line_Item__c"},
+            fieldApiName: "Work_Order_Line_Item__c",
+            nameField: "WorkOrderLineItem.LineItemNumber"
+        }, 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' }] 
     },
     { 
-        label: 'Description', fieldName: 'Description', initialWidth: 50, editable: false, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true 
+        label: 'Training Product Delivered', type: 'lookupColumn', fieldName: 'Training_Product_Delivered__c',
+        typeAttributes: { 
+            recordId: { fieldName: "Training_Product_Delivered__c"},
+            fieldApiName: "Training_Product_Delivered__c",
+            nameField: "Product2.Name"
+        }, 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' }] 
     },
     { 
-        label: 'Scheduled Start', fieldName: 'SchedStartTime', initialWidth: 50, editable: false, type: "date-local",
-        typeAttributes:{month: "2-digit", day: "2-digit"}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true 
+        label: 'Description', type: 'text', fieldName: 'Description',
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }]
     },
     { 
-        label: 'Customer Local Start', fieldName: 'Scheduled_Customer_Start__c', initialWidth: 50, editable: false, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true
+        label: 'Scheduled Start', type: "date-local", fieldName: 'SchedStartTime', 
+        typeAttributes: {
+            month: "2-digit", 
+            day: "2-digit"
+        }, 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }]
     },
     { 
-        label: 'Status', fieldName: 'Status', initialWidth: 50, editable: false, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true 
+        label: 'Customer Local Start', type: "text", fieldName: 'Scheduled_Customer_Start__c', 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }]
     },
     { 
-        label: 'Scheduling Status', fieldName: 'Schedulers_Status__c', type: 'picklistColumn', initialWidth: 50, editable: true, 
-        typeAttributes: { placeholder: 'Select Schedulers Status', options: { fieldName: 'schedulingOptions' }, value: { fieldName: 'Schedulers_Status__c' }, context: { fieldName: 'Id' }}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true
+        label: 'Status', type: "text", fieldName: 'Status', 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }]
     },
-    {
-        label: 'Trainer to Assign', fieldName: 'Trainer_Mass_Assign__c', type: 'lookupColumn', cellAttributes: { alignment: 'right' }, initialWidth: 50, editable: false,
-        typeAttributes: {object: 'ServiceAppointment', fieldName: 'Trainer_Mass_Assign__c', value: { fieldName: 'Trainer_Mass_Assign__c' }, context: { fieldName: 'Id' }, name: 'User', fields: ['User.Name'], edit: true, target: '_self'}, 
-        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
-        hideDefaultActions: true
+    { 
+        label: 'Scheduling Status',  type: 'picklistColumn', fieldName: 'Schedulers_Status__c', 
+        typeAttributes: { 
+            options: { 
+                fieldName: 'schedulingOptions' 
+            }, 
+        },
+        editable: true, initialWidth: 50, hideDefaultActions: true, 
+        actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }]
     },
+    { 
+        label: 'Trainer to Assign', type: 'lookupColumn', fieldName: 'Trainer_Mass_Assign__c',
+        typeAttributes: { 
+            recordId: { fieldName: "Trainer_Mass_Assign__c"},
+            fieldApiName: "Trainer_Mass_Assign__c",
+            nameField: "User.Name"
+        }, 
+        editable: false, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' }] 
+    }
+    /*{ 
+        label: 'Contact', type: 'lookupColumn', fieldName: 'ContactId',
+        typeAttributes: { 
+            recordId: { fieldName: "ContactId"},
+            fieldApiName: "ContactId",
+            nameField: "Contact.Name"
+        }, 
+        editable: true, initialWidth: 50, hideDefaultActions: true,
+        actions: [{ label: 'Collapse', checked: false, name: 'collapsed' },] 
+    },*/
+    /*
     {
         label: 'Trainer', fieldName: 'Trainer__c', type: 'lookupColumn', initialWidth: 50, editable: false,
         typeAttributes: {object: 'ServiceAppointment', fieldName: 'Trainer__c', value: { fieldName: 'Trainer__c' }, context: { fieldName: 'Id' }, name: 'User', fields: ['User.Name'], edit: false, target: '_self'}, 
@@ -288,7 +332,7 @@ const columns = [
         label: 'Special Shipping Instructions', fieldName: 'Special_Shipping_Instructions__c', initialWidth: 50, editable: true, 
         actions: [{ label: 'Collapse', checked: true, name: 'collapsed' }], 
         hideDefaultActions: true 
-    },
+    },*/
 ]
 
 
@@ -297,7 +341,7 @@ export default class MassEditTable extends LightningElement {
     @track serviceAppointments = [];
     @track disabled = true;
     @track showSpinner = true;
-    @track showHeader = false;
+    //@track showHeader = false;
     lastSavedData = [];
     rowLimit = 20;
     rowOffSet = 0;
@@ -352,6 +396,10 @@ export default class MassEditTable extends LightningElement {
     parentAccountSelectedRecord;
     handleValueSelectedOnAccount(event) {
         this.parentAccountSelectedRecord = event.detail;
+    }
+
+    get showButtonBar() {
+        return this.changedRows?.length > 0;
     }
     
     @track plsOptions;
@@ -446,7 +494,12 @@ export default class MassEditTable extends LightningElement {
                 }
             }
             this.serviceAppointments = [...this.serviceAppointments, ...filteredData];
+            if(this.changedRows) {
+                console.log("log");
+            }
             this.serviceAppointments.forEach(SA => {
+                SA.accountName = SA.ContactId != undefined ? SA.Contact.Name : '';
+                SA.accountUrl = SA.ContactId != undefined ? SA.ContactId : '';
                 SA.trainerLink = SA.Trainer__c != undefined ? '/' + SA.Trainer__c : '';
                 SA.trainerName = SA.Trainer__c != undefined ? SA.Trainer__c.Name : '';
                 SA.AppointmentNumberUrl = '/' + SA.Id;
@@ -806,17 +859,18 @@ export default class MassEditTable extends LightningElement {
         }
     }
 
+    //Lists the changed fields in the mass edit section as key value pairs like {Date: '1/1/2001', Phone: '111-111-1111', Email: 'google@gmail.com'}
     changedFields = {};
 
     handleFieldChange(e) {
-        this.bulkFieldsChanged(e.target.fieldName, e.target.value);
+        this.massEditFieldsChanged(e.target.fieldName, e.target.value);
     }
 
     handleBooleanChange(e) {
-        this.bulkFieldsChanged(e.currentTarget.name, e.detail.value);
+        this.massEditFieldsChanged(e.currentTarget.name, e.detail.value);
     }
 
-    bulkFieldsChanged(fieldName, fieldValue) {
+    massEditFieldsChanged(fieldName, fieldValue) {
         console.log('Field ' + fieldName + ' was changed to: ' + fieldValue);
 
         //Check for nulls, undefined, and empty strings
@@ -836,6 +890,54 @@ export default class MassEditTable extends LightningElement {
         }
 
         //console.log('Changed fields: ', this.changedFields);
+    }
+
+    //Stores the Inline Edit values as an array or objects like [{Id: '123', Name: 'Bill'},{Id: '456', Name: 'Ted'}]
+    changedRows = [];
+
+    handleCellChange(e) {
+        const draftValues = [...e.detail.draftValues];
+        draftValues.forEach(record => {this.inlineEditChanges(record)});
+    }
+
+    inlineEditChanges(draftValue) {
+        const changedRows = [...this.changedRows];
+        const existingDraftRecord = changedRows.find(row => row.Id === draftValue.Id);
+
+        if(existingDraftRecord) {
+            Object.keys(draftValue).forEach(field => {
+                if (field !== 'Id') {
+                    existingDraftRecord[field] = draftValue[field];
+                }
+            });
+        } else {
+            changedRows.push({...draftValue});
+        }
+
+        const tableRow = this.serviceAppointments.find(row => row.Id === draftValue.Id);
+        Object.keys(draftValue).forEach(field => {
+            if (field !== 'Id') {
+                tableRow[field] = draftValue[field];
+            }
+        });
+
+        this.changedRows = [...changedRows];
+        //this.draftValues = [...this.changedRows];
+        console.table(this.changedRows);
+    }
+
+    handleCancel() {
+        this.changedRows = [];
+        this.draftValues = [];
+        /*console.log("cancel");
+        this.draftValues = []; //clears the draftValues array
+        this.serviceAppointments = this.lastSavedData; //reverts the changed data back to the last saved data
+        console.log("this.lastSavedData: ", this.lastSavedData);
+        console.log("this.serviceAppointments: ", this.serviceAppointments);*/
+    }
+
+    handleSave() {
+
     }
 
     //handles header field changes
@@ -948,13 +1050,13 @@ export default class MassEditTable extends LightningElement {
             section.fields.forEach(field => {
                 field.value = null
                 //Update the changedFields array
-                this.bulkFieldsChanged(field.apiName.fieldApiName, null);
+                this.massEditFieldsChanged(field.apiName.fieldApiName, null);
             });
         });
         this.organizedFields = [...this.organizedFields];
 
         //Reset the values in the HTML
-        const inputFields = this.template.querySelectorAll('[data-group="massEditFields"]');
+        const inputFields = this.template.querySelectorAll('[data-type="massEditFields"]');
         if (inputFields) {
             inputFields.forEach(field => {
                 field.value = null;
@@ -1111,10 +1213,6 @@ export default class MassEditTable extends LightningElement {
         //})
     }*/
 
-    handleRowAction() {
-        console.log('row action');
-    }
-
 
     multpicklistChanged(event) {
         event.stopPropagation();
@@ -1166,18 +1264,19 @@ export default class MassEditTable extends LightningElement {
         }
     }
 
-    handleCellChange(event) { //event is run when a cell is edited using inline edit
-        let draftValues = event.detail.draftValues; //assings the changed values to a variable
-        draftValues.forEach(ele => { //runs for each draft value
+    /*handleCellChange(e) {
+        const draftValues = [...e.detail.draftValues];
+        console.log('draftValues', draftValues);
+        /*draftValues.forEach(ele => { //runs for each draft value
             this.updateDraftValues(ele);
         });
         draftValues.forEach(ele => { //runs for each draft value
             this.updateDataValues(ele);
         })
-    }
+    }*/
 
     updateDraftValues(updateItem) {
-        this.showHeader = true;
+        //this.showHeader = true;
         let draftValueChanged = false;
         let copyDraftValues = [...this.draftValues];
         copyDraftValues.forEach(item => {
@@ -1208,8 +1307,8 @@ export default class MassEditTable extends LightningElement {
     };
 
     afterSaveResult = {};
-    handleSave(event) {
-        this.showSpinner = true;
+    //handleSave(event) {
+        /*this.showSpinner = true;
         this.saveDraftValues = JSON.parse(JSON.stringify(this.draftValues));
         console.log("this.saveDraftValues: ", this.saveDraftValues);
         updateRecords({ recordsToUpdate: this.saveDraftValues })
@@ -1321,7 +1420,7 @@ export default class MassEditTable extends LightningElement {
         }).finally(() => {
             refreshApex(this.refreshServiceAppointments);
         });*/
-    }
+    //}
 
     //updates datatable when lookup field (school) is changed
     /*lookupChanged(event) {
@@ -1529,15 +1628,7 @@ export default class MassEditTable extends LightningElement {
     }*/
     
     //cancel button
-    handleCancel() {
-        console.log("cancel");
-        this.showHeader = false; //hides the custom save/cancel header
-        this.draftValues = []; //clears the draftValues array
-        this.serviceAppointments = this.lastSavedData; //reverts the changed data back to the last saved data
-        console.log("this.lastSavedData: ", this.lastSavedData);
-        console.log("this.serviceAppointments: ", this.serviceAppointments);
-    }
-
+    
     //When fields are edited from the page sections; create a collection of objects storing edited fields and add each selected record Id
     createDraftRecords() {
         const draftRecords = this.selectedRowIds.map(id => ({
@@ -1548,79 +1639,76 @@ export default class MassEditTable extends LightningElement {
     }
 
     updateRecords(draftRecords) {
-        if(draftRecords) {
+        if(draftRecords?.length > 0) {
             console.log('Table of records about to be updated: ');
             console.table(draftRecords);
-            if(draftRecords.length > 0) {
-                //Only return the results that have an Id and at least one other field
-                const recordsToUpdate = draftRecords.filter(record => {
-                    const fields = Object.keys(record);
-                    return (fields.length > 1 && fields.includes('Id'));
-                });
-                /*********Passed all error checks and ready for update*************/
-                if(recordsToUpdate.length > 0) {
-                    updateRecords({ records: recordsToUpdate })
-                        .then(results => {
-                            const successCount = results.filter(r => r.success).length;
-                            const errorResults = results.filter(r => !r.success);
+            //Only return the results that have an Id and at least one other field
+            const recordsToUpdate = draftRecords.filter(record => {
+                const fields = Object.keys(record);
+                return (fields.length > 1 && fields.includes('Id'));
+            });
+    
+            if(recordsToUpdate.length > 0) {
+                updateRecords({ records: recordsToUpdate })
+                    .then(results => {
+                        const successCount = results.filter(r => r.success).length;
+                        const errorResults = results.filter(r => !r.success);
 
-                            if (successCount > 0) {
-                                let message = new ShowToastEvent({
-                                    title: 'Success',
-                                    message: `${successCount} record${successCount > 1 ? 's' : ''} updated successfully`,
-                                    variant: 'success',
-                                    mode: 'dismissible'
-                                });
-                                this.dispatchEvent(message);
-                            }
+                        if (successCount > 0) {
+                            let message = new ShowToastEvent({
+                                title: 'Success',
+                                message: `${successCount} record${successCount > 1 ? 's' : ''} updated successfully`,
+                                variant: 'success',
+                                mode: 'dismissible'
+                            });
+                            this.dispatchEvent(message);
+                        }
 
-                            if (errorResults.length > 0) {
-                                let errorMessage = errorResults
-                                    .map(r => `Record ${r.recordId} failed to update: ${r.errorMessages.join('; ')}`)
-                                    .join(', ');
+                        if (errorResults.length > 0) {
+                            let errorMessage = errorResults
+                                .map(r => `Record ${r.recordId} failed to update: ${r.errorMessages.join('; ')}`)
+                                .join(', ');
 
-                                let message = new ShowToastEvent({
-                                    title: 'Error',
-                                    message: errorMessage,
-                                    variant: 'error',
-                                    mode: 'sticky'
-                                });
-                                this.dispatchEvent(message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Apex call failed: ', error);
-                        })
-                } else {
-                    let message = new ShowToastEvent({
-                        title: 'Error',
-                        message: 'No fields were edited. Please select at least one record and edit at least one field.',
-                        variant: 'error',
-                        mode: 'sticky'
-                    });
-                    this.dispatchEvent(message);
-                    console.log('"draftRecords" either didnt contain any Ids, or had no fields to update: ' + draftRecords);
-                }
+                            let message = new ShowToastEvent({
+                                title: 'Error',
+                                message: errorMessage,
+                                variant: 'error',
+                                mode: 'sticky'
+                            });
+                            this.dispatchEvent(message);
+                        }
+                    })
+                    .catch(error => {
+                        let message = new ShowToastEvent({
+                            title: 'Error',
+                            message: 'Apex call failed: ' + error,
+                            variant: 'error',
+                            mode: 'sticky'
+                        });
+                        this.dispatchEvent(message);
+                        console.error('Apex call failed: ', error);
+                    })
             } else {
                 let message = new ShowToastEvent({
                     title: 'Error',
-                    message: 'No records selected to be updated. Please select at least row on the table below.',
+                    message: 'No fields were edited. Please select at least one record and edit at least one field.',
                     variant: 'error',
                     mode: 'sticky'
                 });
                 this.dispatchEvent(message);
-                console.log('0 records were included in "draftRecords": ' + draftRecords);
+                console.log('"draftRecords" either didnt contain any Ids, or had no fields to update: ' + draftRecords);
             }
         } else {
             let message = new ShowToastEvent({
                 title: 'Error',
-                message: 'No records provided to be updated.',
+                message: 'No records selected to be updated. Please select at least row on the table below.',
                 variant: 'error',
                 mode: 'sticky'
             });
             this.dispatchEvent(message);
-            console.log('Falsy value returned for "draftRecords": ' + draftRecords);
+            console.log('0 records were included in "draftRecords": ' + draftRecords);
         }
+    }
         /*this.showSpinner = true;
         this.changedValues = this.selectedRecords.map(item => ({ Id: item.Id}));
         console.log(this.changedValues); //the selected values to be changed
@@ -1711,8 +1799,8 @@ export default class MassEditTable extends LightningElement {
         }).finally(() => {
            refreshApex(this.refreshServiceAppointments);
            this.showSpinner = false;
-        });*/
-    }
+        });
+    }*/
 
     handleHeaderAction (event) { //used to enable custom header actions for columns
         const actionName = event.detail.action.name; // Retrieves the name of the selected filter

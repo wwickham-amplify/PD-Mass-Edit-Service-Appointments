@@ -64,7 +64,7 @@
                                                 <template for:each={section.fields} for:item="field">
                                                     <div key={field.apiName} class="slds-col slds-size_1-of-2">
                                                         <template lwc:if={field.typeBool}>
-                                                            <!--Booleam fields are handled differently; display as a picklist with a "None" option-->
+                                                            <!--Booleam fields are handled different than standard; display as a picklist with a "None" option-->
                                                             <lightning-combobox
                                                                 label={field.name}
                                                                 name={field.apiName.fieldApiName}
@@ -73,8 +73,7 @@
                                                                 placeholder="--None--" dropdown-alignment="auto"
                                                                 onchange={handleBooleanChange}
                                                                 class="comboBoxStyle"
-                                                                data-group="massEditFields"
-                                                                data-api-name={field.apiName.fieldApiName}>
+                                                                data-type="massEditFields">
                                                             </lightning-combobox>
                                                         </template>
                                                         <template lwc:else>
@@ -83,8 +82,7 @@
                                                                 data-id={field.apiName}
                                                                 value={field.value}
                                                                 onchange={handleFieldChange}
-                                                                data-group="massEditFields"
-                                                                data-api-name={field.apiName}>
+                                                                data-type="massEditFields">
                                                             </lightning-input-field>
                                                         </template>
                                                     </div>
@@ -306,33 +304,41 @@
             </div>
 
         </lightning-layout-item>
-        <div if:true={showHeader}>
+        <div lwc:if={showButtonBar}>
             <div class="saveBar">
-                <lightning-button label="Cancel" title="Non-primary action" onclick={handleCancel} class="slds-m-left_x-small"></lightning-button>
-                <lightning-button variant="brand" label="Save" title="Primary action" onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+                <lightning-button label="Cancel" title="cancel" onclick={handleCancel} class="slds-m-left_x-small"></lightning-button>
+                <lightning-button label="Save" title="save" onclick={handleSave} class="slds-m-left_x-small" variant="brand"></lightning-button>
             </div>
         </div>
         <lightning-layout style="height:500px">
             <lightning-layout-item size=12>
-            <c-l-w-c-lookup-custom-datatable-type
+            <!--<c-l-w-c-lookup-custom-datatable-type
                 key-field="Id" 
                 data={serviceAppointments} 
                 columns={columns}
-                onrowaction={handleRowAction} 
-                onlookupchanged={lookupChanged} 
-                onvalueselect={handleSelection}
                 oncellchange={handleCellChange} 
-                oncancel={handleCancel} 
+                onlookupchanged={lookupChanged}  
                 onrowselection={handleRowSelection}
                 draft-values={draftValues} 
-                onsave={handleSave} 
                 enable-infinite-loading
                 onloadmore={loadMoreData}
                 onheaderaction={handleHeaderAction}
                 onpicklistchanged={multpicklistChanged}
                 onpicklistchangedgrade={multipicklistChangedGrade}
-                suppress-bottom-bar>
-            </c-l-w-c-lookup-custom-datatable-type>
+                suppress-bottom-bar data-type="customTable">
+            </c-l-w-c-lookup-custom-datatable-type>-->
+            <c-custom-service-appointments-data-table
+                key-field="Id" 
+                data={serviceAppointments} 
+                columns={columns}
+                oncellchange={handleCellChange}
+                onrowselection={handleRowSelection}
+                draft-values={draftValues} 
+                enable-infinite-loading
+                onloadmore={loadMoreData}
+                onheaderaction={handleHeaderAction}
+                suppress-bottom-bar data-type="customTable">
+            </c-custom-service-appointments-data-table>
             <template if:true={noData}>
                 <p style="position: relative;top: -450px;left: 265px;">{errorMessage}</p>
             </template>

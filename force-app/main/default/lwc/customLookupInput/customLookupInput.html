@@ -1,0 +1,23 @@
+<template>
+    <!--One day I will use you, my beloved record picker-->
+    <!--<lightning-record-picker
+        label={columnLabel}
+        value={value}
+        placeholder="Search records..."
+        object-api-name="Account"
+        data-inputable="true"
+        onchange={handleChange}>
+    </lightning-record-picker>-->
+    <lightning-record-edit-form object-api-name="ServiceAppointment">
+        <lightning-input-field
+            class="slds-popover slds-popover_edit slds-popover__body padding"
+            field-name={fieldName}
+            value={value} 
+            variant='label-hidden'
+            onchange={handleChange}
+            data-inputable="true"
+            data-id="input"
+            >
+        </lightning-input-field>
+    </lightning-record-edit-form>
+</template>

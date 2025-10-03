@@ -1,0 +1,10 @@
+<template>
+    <!--Custom input because lightning record picker 
+    doesn't work with custom data types yet :(-->
+    <c-custom-lookup-input 
+        value={editedValue}
+        column-label={columnLabel}
+        field-name={typeAttributes.fieldApiName}
+        data-inputable="true">
+    </c-custom-lookup-input>
+</template>
