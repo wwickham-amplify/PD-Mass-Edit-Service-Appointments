@@ -19,7 +19,7 @@ export default class CustomServiceAppointmentsDataTable extends LightningDatatab
             template: picklistTemplate,
             editTemplate: picklistTemplateEdit,
             standardCellLayout: true,
-            typeAttributes: ["options"]
+            typeAttributes: ["options", "multiSelect"]
         }
         /*lookupColumn: {
             template: lookupColumn,

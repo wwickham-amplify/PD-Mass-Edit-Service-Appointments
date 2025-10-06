@@ -1,10 +1,28 @@
 <template>
-    <lightning-combobox
+    <!--<lightning-combobox
         name={columnLabel}
         label={columnLabel}
         placeholder="Select option..."
         value={editedValue}
         options={typeAttributes.options}
         data-inputable="true">
-    </lightning-combobox>
+    </lightning-combobox>-->
+    <template lwc:if={typeAttributes.multiSelect}>
+        <lightning-select
+            label={columnLabel}
+            field-level-help="Hold the Ctrl, Command, or Shift keys to select multiple options"
+            value={editedValue}
+            options={typeAttributes.options}
+            multiple
+            data-inputable="true">
+        </lightning-select>
+    </template>
+    <template lwc:else>
+        <lightning-select
+            label={columnLabel}
+            value={editedValue}
+            options={typeAttributes.options}
+            data-inputable="true">
+        </lightning-select>
+    </template>
 </template>
