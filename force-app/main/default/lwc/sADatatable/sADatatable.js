@@ -410,6 +410,8 @@ export default class MassEditTable extends LightningElement {
     _selectedType = [];
     _selectedGrades = [];
 
+    wiredResult;
+
     parentAccountSelectedRecord;
     handleValueSelectedOnAccount(event) {
         this.parentAccountSelectedRecord = event.detail;
@@ -451,8 +453,9 @@ export default class MassEditTable extends LightningElement {
         this.workOrderFilter = event.target.value;
         console.log("this.workOrderFilter: ", this.workOrderFilter);
         this.rowOffSet = 0;
-        this.serviceAppointments = [];
-        //this.showSpinner = true;
+        this.data = [];
+        this.showSpinner = true;
+        this.isLoading = true;
     }
 
     //status filter changed
@@ -460,8 +463,9 @@ export default class MassEditTable extends LightningElement {
         this.statusFilter = event.target.value;
         console.log("this.statusFilter: ", this.statusFilter);
         this.rowOffSet = 0;
-        this.serviceAppointments = [];
-        //this.showSpinner = true;
+        this.data = [];
+        this.showSpinner = true;
+        this.isLoading = true;
     }
 
     //account filter changed
@@ -469,8 +473,9 @@ export default class MassEditTable extends LightningElement {
         this.accountFilter = event.target.value;
         console.log("this.accountFilter: ", this.accountFilter);
         this.rowOffSet = 0;
-        this.serviceAppointments = [];
-        //this.showSpinner = true;
+        this.data = [];
+        this.showSpinner = true;
+        this.isLoading = true;
     }
 
     //event to handle user typing in product family search box
@@ -478,8 +483,9 @@ export default class MassEditTable extends LightningElement {
         clearTimeout(this.typingTimer);
         let value = event.target.value;
         this.rowOffSet = 0;
-        this.serviceAppointments = [];
-        //this.showSpinner = true;
+        this.data = [];
+        this.showSpinner = true;
+        this.isLoading = true;
         this.typingTimer = setTimeout(() => {
             this.productFamilyFilter = value;
         }, 500);
@@ -980,6 +986,7 @@ export default class MassEditTable extends LightningElement {
                     .finally(() => {
                         this.showSpinner = false;
                         this.isLoading = false;
+                        refreshApex(this.wiredResult);
                     });
             } else {
                 this.showToast('Error', 'No fields were edited. Please update the value of at least one field.', 'error', 'sticky');
@@ -996,7 +1003,6 @@ export default class MassEditTable extends LightningElement {
 
         this.changedRows = [];
         this.draftValues = [];
-        refreshApex(this.wiredResult);
     }
 
     handleHeaderAction (event) { //used to enable custom header actions for columns
